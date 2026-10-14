@@ -1,0 +1,893 @@
+/* Portfolio (home, proyectos, 404). Títulos en serif; cada sección va en dos columnas
+   (icono + título fijos a la izquierda, contenido en tarjetas a la derecha) y tiene su
+   propio color vía [data-tone]. Oscuro por defecto; [data-theme="light"] lo aclara.
+   La hoja del CV va aparte: cv.css. */
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/instrument-serif-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #0a101f;
+  --surface: #111a30;
+  --surface-2: #17213a;
+  --line: #1e2942;
+  --line-strong: #2f3d5e;
+  --ink: #f3f5fa;
+  --text: #c2cadb;
+  --muted: #8791a8;
+  --btn-bg: #f5b740;
+  --btn-ink: #1b1303;
+  --ok: #34d399;
+  --err: #f87171;
+  --nav-bg: rgba(10, 16, 31, 0.96);
+
+  /* Tonos de sección. --tone es el activo; --accent, el de la marca. */
+  --amber: #f5b740;
+  --sky: #5ab4f5;
+  --violet: #a78bfa;
+  --teal: #2dd4bf;
+  --rose: #fb7185;
+  --accent: var(--amber);
+  --tone: var(--amber);
+
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  --rail: 15rem;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #f8f7f3;
+  --surface: #ffffff;
+  --surface-2: #f4f2ec;
+  --line: #e0ddd3;
+  --line-strong: #c9c5b8;
+  --ink: #14213d;
+  --text: #2b3448;
+  --muted: #5d6679;
+  --ok: #0b7a54;
+  --err: #b42318;
+  --nav-bg: rgba(248, 247, 243, 0.97);
+  --amber: #a8500a;
+  --sky: #0b68b8;
+  --violet: #6d3fd1;
+  --teal: #0b7a6e;
+  --rose: #c0264a;
+  color-scheme: light;
+}
+
+[data-tone="amber"] { --tone: var(--amber); }
+[data-tone="sky"] { --tone: var(--sky); }
+[data-tone="violet"] { --tone: var(--violet); }
+[data-tone="teal"] { --tone: var(--teal); }
+[data-tone="rose"] { --tone: var(--rose); }
+/* Variantes suaves del tono, para fondos y bordes. */
+:root,
+[data-tone] {
+  --tone-soft: color-mix(in srgb, var(--tone) 11%, transparent);
+  --tone-line: color-mix(in srgb, var(--tone) 40%, transparent);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 5.5rem; }
+/* site.js agrega .smooth después de la carga: entrar con #ancla salta directo
+   y sólo la navegación interna se desplaza suave. */
+html.smooth { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 1rem/1.65 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; }
+::selection { background: var(--accent); color: var(--btn-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 0.2rem; }
+.icon { display: block; flex: none; }
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -5rem;
+  z-index: 50;
+  padding: 0.55rem 1rem;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.skip:focus { top: 1rem; }
+
+.wrap { max-width: 72rem; margin: 0 auto; padding: 0 2rem; }
+
+/* ---------- piezas reutilizadas ---------- */
+
+h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.lead { font-size: 1.3rem; line-height: 1.5; color: var(--ink); }
+
+.kicker {
+  font: 500 0.72rem/1.5 var(--mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--tone-line); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chips li {
+  padding: 0.16rem 0.65rem;
+  border: 1px solid var(--tone-line);
+  border-radius: 999px;
+  background: var(--tone-soft);
+  font: 500 0.74rem/1.6 var(--mono);
+  color: var(--ink);
+}
+
+/* Chips de tecnología (src/tech.mjs): el color lo pone el logo de cada una, o su icono. */
+.tech { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tech li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.28rem 0.7rem 0.28rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  background: var(--surface-2);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--ink);
+  transition: border-color 0.15s;
+}
+.tech li:hover { border-color: var(--tone-line); }
+.tech-logo { display: block; flex: none; width: 1rem; height: 1rem; }
+.tech-ink { color: var(--ink); }
+.tech-icon { display: grid; place-items: center; flex: none; color: var(--tone); }
+.tech-icon .icon { width: 1rem; height: 1rem; }
+.tech-dot { flex: none; width: 0.45rem; height: 0.45rem; margin: 0 0.2rem; border-radius: 50%; background: var(--tone); }
+/* Los logos se definen una vez por página y los chips los usan con <use>. */
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 3rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-ink);
+  font-weight: 600;
+  font-size: 0.98rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn .icon,
+.more .icon { transition: transform 0.15s; }
+.btn:hover .icon,
+.more:hover .icon { transform: translateX(3px); }
+
+/* Link de texto con flecha: giia.com.ar ↗ */
+.tlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.32em;
+}
+.tlink:hover { text-decoration-color: var(--tone); }
+.tlink .icon { width: 0.95rem; height: 0.95rem; color: var(--muted); }
+
+.more { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--tone); text-decoration: none; }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.7rem 0.2rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--ok) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--ok);
+  white-space: nowrap;
+}
+.dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--ok); }
+
+.bullets li { position: relative; padding-left: 1.2rem; }
+.bullets li + li { margin-top: 0.4rem; }
+.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0.1rem;
+  top: 0.66em;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  background: var(--tone);
+}
+
+/* ---------- nav ---------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--nav-bg);
+  /* Sin backdrop-filter a propósito: un desenfoque sobre contenido que scrollea o se anima
+     se recalcula en cada cuadro y hacía tironear la página. El fondo casi opaco alcanza. */
+  border-bottom: 1px solid var(--line);
+}
+.nav-in { display: flex; align-items: center; gap: 2rem; height: 4.25rem; }
+.wordmark {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-links { display: flex; gap: 2rem; margin-left: auto; }
+.nav-links a {
+  position: relative;
+  padding: 0.45rem 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.nav-links a:hover,
+.nav-links a[aria-current="true"] { color: var(--ink); }
+.nav-links a[aria-current="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.1rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.nav-tools { display: flex; align-items: center; gap: 0.35rem; }
+.nav-cv {
+  margin-right: 0.35rem;
+  padding: 0.4rem 0.95rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.nav-cv:hover { border-color: var(--accent); }
+.nav-lang {
+  padding: 0.45rem 0.5rem;
+  font: 500 0.76rem/1 var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-decoration: none;
+}
+.nav-lang:hover { color: var(--ink); }
+.nav-icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.nav-icon:hover { color: var(--ink); }
+.icon-moon { display: none; }
+:root[data-theme="light"] .icon-sun { display: none; }
+:root[data-theme="light"] .icon-moon { display: block; }
+/* Sin JS el botón de tema no hace nada: mejor no mostrarlo. */
+html:not(.js) [data-theme-toggle] { display: none; }
+
+.menu { display: none; position: relative; }
+.menu summary { list-style: none; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.9rem);
+  display: grid;
+  min-width: 13rem;
+  padding: 0.4rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 0.9rem;
+}
+.menu-panel a { padding: 0.8rem 0; color: var(--ink); text-decoration: none; }
+.menu-panel a + a { border-top: 1px solid var(--line); }
+
+/* ---------- hero ---------- */
+
+/* El canvas (src/fish.js) ocupa todo el hero y queda detrás del contenido: un cardumen
+   que rodea la foto. La máscara lo desvanece en los bordes laterales.
+   Sin JS el hero se ve igual, sólo que sin fondo animado. */
+.hero { position: relative; overflow: clip; padding: 4.25rem 0 4.75rem; text-align: center; }
+.fx {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-in { position: relative; z-index: 1; display: grid; justify-items: center; }
+
+.portrait {
+  display: block;
+  width: 12.5rem;
+  height: 12.5rem;
+  padding: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: 50%;
+  background: var(--bg);
+  object-fit: cover;
+  box-shadow:
+    0 0 0 0.65rem color-mix(in srgb, var(--accent) 8%, transparent),
+    0 0 5.5rem color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.hero h1 { margin-top: 1.9rem; font-size: clamp(2.75rem, 7vw, 4.75rem); }
+/* El texto va sobre el cardumen: la sombra del color de fondo lo despega. */
+.hero h1,
+.hero .lead { text-shadow: 0 0 1.25rem var(--bg), 0 0 0.5rem var(--bg); }
+.hero .lead { margin-top: 1rem; max-width: 34rem; font-size: clamp(1.15rem, 1.8vw, 1.4rem); line-height: 1.45; text-wrap: balance; }
+
+.facts { margin-top: 2rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+.facts > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+}
+.facts dt {
+  font: 500 0.68rem/1.5 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.facts dd { font-size: 0.93rem; color: var(--ink); }
+
+.hero-links { margin-top: 2.1rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem 1.5rem; }
+.hero-links .tlink { font-size: 0.95rem; }
+
+/* Los peces que acompañan al scrollear (los crea src/fish.js): una capa fija detrás del
+   contenido. Se ven en los márgenes y entre tarjetas; las tarjetas los tapan. */
+.fx-follow { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+/* Cada pez es un <svg> chico; src/fish.js sólo le cambia el transform. */
+.follower { position: absolute; left: 0; top: 0; display: block; overflow: visible; fill: var(--amber); opacity: 0.9; will-change: transform; }
+.follower-plain { fill: var(--muted); opacity: 0.55; }
+.follower-tail { transform-box: fill-box; transform-origin: 100% 50%; animation: follower-wag 0.55s ease-in-out infinite alternate; }
+@keyframes follower-wag {
+  from { transform: rotate(-16deg); }
+  to { transform: rotate(16deg); }
+}
+main { position: relative; z-index: 1; }
+
+/* ---------- secciones ---------- */
+
+.sec { border-top: 1px solid var(--line); padding: 4.75rem 0; }
+.sec-in { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); gap: 4.5rem; }
+.sec-head { position: sticky; top: 6.25rem; align-self: start; }
+.sec-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1.15rem;
+  border: 1px solid var(--tone-line);
+  border-radius: 0.9rem;
+  background: var(--tone-soft);
+  color: var(--tone);
+}
+.sec-icon .icon { width: 1.35rem; height: 1.35rem; }
+.sec-head p { margin-top: 0.75rem; max-width: 13rem; font-size: 0.92rem; line-height: 1.5; color: var(--muted); }
+/* Filete corto del color de la sección, debajo del título. */
+.sec-head::after { content: ""; display: block; width: 2.75rem; height: 2px; margin-top: 1.25rem; border-radius: 2px; background: var(--tone); }
+
+.sec-body { min-width: 0; }
+/* El texto corrido tiene ancho de lectura; los carruseles (.rail) usan toda la columna. */
+.sec-body > p,
+.principles,
+.form { max-width: 46rem; }
+.sec-body > p { font-size: 1.05rem; }
+.sec-body > p.lead { font-size: 1.2rem; line-height: 1.55; }
+.sec-body > p + p { margin-top: 1rem; }
+.sec-body > .kicker { display: flex; align-items: center; gap: 0.75rem; margin: 3rem 0 1rem; }
+.sec-body > .kicker::before { content: ""; width: 1.25rem; height: 1px; background: var(--tone); }
+
+/* perfil */
+.principles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+.principles li { padding: 1.2rem 1.3rem 1.3rem; }
+.mini-icon {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  margin-bottom: 0.85rem;
+  border: 1px solid var(--tone-line);
+  border-radius: 0.65rem;
+  background: var(--tone-soft);
+  color: var(--tone);
+}
+.principles h4 { font-size: 1rem; line-height: 1.35; color: var(--ink); }
+.principles p { margin-top: 0.35rem; font-size: 0.93rem; line-height: 1.55; }
+
+.langs { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.langs li { display: flex; align-items: center; gap: 0.65rem; padding: 0.6rem 1.05rem 0.6rem 0.85rem; border-radius: 999px; }
+.langs .icon { color: var(--tone); }
+.langs strong { font-weight: 600; color: var(--ink); }
+.langs span { font-size: 0.86rem; color: var(--muted); }
+
+/* Fuera del código: cada interés con su icono y su color. */
+.offtopic { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.offtopic li { display: flex; align-items: center; gap: 0.7rem; padding: 0.5rem 1.1rem 0.5rem 0.55rem; border-radius: 999px; }
+.offtopic li:hover { border-color: var(--tone-line); }
+.offtopic .mini-icon { width: 2rem; height: 2rem; margin: 0; border-radius: 999px; }
+.offtopic .mini-icon .icon { width: 1rem; height: 1rem; }
+.offtopic span:last-child { font-weight: 500; color: var(--ink); }
+
+/* Carrusel: las tarjetas de una sección van en fila y se deslizan en horizontal.
+   Funciona sin JS (scroll nativo, teclado y táctil); site.js sólo suma las flechas. */
+.rail {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  /* El padding deja lugar al foco y al borde de las tarjetas; el margen lo compensa. */
+  margin: -0.4rem;
+  padding: 0.4rem 0.4rem 1.1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 0.4rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--tone-line) transparent;
+}
+.rail > * { flex: 0 0 auto; scroll-snap-align: start; }
+.rail > .work { width: min(27rem, 86%); }
+
+/* Paginado. Los anchos se calculan sobre el ancho visible del carrusel (100cqi), así lo
+   que se ve al entrar y al terminar entra entero y no queda texto cortado en el borde:
+   una empresa con dos puestos ocupa la página completa; el resto, media página. */
+.rail-pin { container-type: inline-size; }
+@supports (width: 1cqi) {
+  .rail > .entry,
+  .rail > .work { width: calc((100cqi - 1rem) / 2); }
+  .rail > .entry-wide { width: 100cqi; }
+  .rail .role,
+  .rail .roles-solo .role { flex: 1 1 0; width: auto; min-width: 0; }
+
+  /* Carrusel angosto: una tarjeta por página. La empresa con dos puestos ocupa dos
+     páginas, un puesto en cada una (el hueco entre puestos es el doble del relleno de la
+     tarjeta, así el segundo arranca justo una página después que el primero). */
+  @container (max-width: 44rem) {
+    .rail > .entry,
+    .rail > .work { width: 100cqi; }
+    .rail > .entry-wide { width: auto; }
+    .entry-wide .roles { gap: calc(2 * var(--entry-px)); }
+    .rail .entry-wide .role { flex: none; width: calc(100cqi - 2 * var(--entry-px)); }
+  }
+}
+
+.rail-nav { margin-top: 1.6rem; display: flex; gap: 0.5rem; }
+.rail-nav[hidden] { display: none; }
+.rail-btn {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--tone-line);
+  border-radius: 50%;
+  background: var(--tone-soft);
+  color: var(--tone);
+  cursor: pointer;
+  transition: opacity 0.15s, background-color 0.15s;
+}
+.rail-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--tone) 22%, transparent); }
+.rail-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* experiencia, proyectos y educación: una tarjeta por ítem */
+.entries { display: grid; gap: 1rem; }
+.entries.rail { display: flex; }
+.entry { --entry-px: 1.6rem; padding: 1.5rem var(--entry-px) 1.6rem; }
+.entry-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem 1.5rem; }
+.entry h3 { font-size: 1.22rem; line-height: 1.3; font-weight: 650; letter-spacing: -0.01em; color: var(--ink); }
+.entry h3 a { text-decoration-color: var(--line-strong); text-underline-offset: 0.25em; }
+.org { margin-top: 0.15rem; font-size: 0.95rem; font-weight: 600; color: var(--tone); }
+.org span { font-weight: 400; color: var(--muted); }
+.when {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: none;
+  padding: 0.25rem 0.75rem 0.25rem 0.6rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font: 500 0.74rem/1.6 var(--mono);
+  color: var(--text);
+  white-space: nowrap;
+}
+.when .icon { width: 0.9rem; height: 0.9rem; color: var(--tone); }
+.entry .bullets { margin-top: 1.1rem; }
+.entry .tech { margin-top: 1.15rem; }
+.entry .note {
+  margin-left: 0.5rem;
+  font: 400 0.7rem/1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Recorrido dentro de una empresa: Puesto A → Puesto B (el último es el actual). */
+.path { margin-top: 0.4rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; font-size: 0.9rem; color: var(--muted); }
+.path .icon { width: 0.95rem; height: 0.95rem; color: var(--tone); }
+.path span:last-child { font-weight: 600; color: var(--tone); }
+
+/* Los puestos de una empresa, uno al lado del otro y unidos por una línea de tiempo: del
+   más viejo (izquierda) al actual (derecha, punto lleno). En pantallas angostas se apilan. */
+.roles { margin-top: 1.6rem; padding-top: 1.5rem; border-top: 2px solid var(--tone-line); display: flex; gap: 2.25rem; }
+.role { position: relative; flex: none; width: 26rem; }
+.role::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(-1.5rem - 1px - 0.4rem);
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--tone);
+  border-radius: 50%;
+  background: var(--surface);
+}
+.role:last-child::before { background: var(--tone); box-shadow: 0 0 0 0.25rem var(--tone-soft); }
+.role-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.2rem 1rem; }
+.role h4 { font-size: 1.08rem; line-height: 1.35; font-weight: 650; color: var(--ink); }
+.role-when { font: 500 0.76rem/1.6 var(--mono); color: var(--muted); white-space: nowrap; }
+.role .bullets { margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.55; }
+.role .bullets li + li { margin-top: 0.3rem; }
+/* Con un solo puesto no hay recorrido que mostrar: sin línea ni punto. */
+.roles-solo { margin-top: 0; padding-top: 0; border-top: 0; }
+.roles-solo .role { width: 26rem; }
+.roles-solo .role::before { display: none; }
+.roles-solo .bullets { margin-top: 1.1rem; }
+
+/* Sección fijada (site.js agrega .is-pinned): mientras se scrollea hacia abajo el carrusel
+   queda quieto, centrado en la pantalla, y las tarjetas pasan de costado; al terminar hay
+   una pausa y sigue bajando. site.js pone la altura extra del cuerpo, el `top` y las
+   variables (--rail-travel, --rail-dwell, --pin-start, --pin-end). */
+.rail-bar { display: none; }
+.is-pinned .rail-pin { position: sticky; }
+/* Sin scrollbar no hace falta el espacio que se le reserva abajo. */
+.is-pinned .rail { overflow-x: hidden; scroll-snap-type: none; padding-bottom: 0.4rem; }
+.is-pinned .rail > * { transform: translateX(var(--rail-x, 0px)); will-change: transform; }
+/* Barra de avance: se llena con las tarjetas y queda completa durante la pausa final. */
+.is-pinned .rail-bar { display: block; height: 2px; margin-top: 0.85rem; border-radius: 2px; background: var(--line); overflow: hidden; }
+.is-pinned .rail-bar span { display: block; height: 100%; background: var(--tone); transform-origin: 0 50%; transform: scaleX(var(--rail-p, 0)); }
+
+/* Donde el navegador lo soporta, el avance va atado al scroll por CSS: lo mueve el
+   compositor, en sincronía exacta con el scroll y sin pasar por JavaScript. El rango
+   termina `--rail-dwell` antes del final: esa es la pausa. */
+@supports (animation-timeline: view()) {
+  .is-native .sec-body { view-timeline: --rail block; view-timeline-inset: var(--pin-start, 0px) var(--pin-end, 0px); }
+  .is-native .rail > *,
+  .is-native .rail-bar span {
+    animation: rail-slide linear both;
+    animation-timeline: --rail;
+    animation-range: contain 0% contain calc(100% - var(--rail-dwell, 0px));
+  }
+  .is-native .rail-bar span { animation-name: rail-fill; }
+}
+@keyframes rail-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-1 * var(--rail-travel, 0px))); }
+}
+@keyframes rail-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.work { padding: 1.5rem 1.7rem 1.6rem; }
+.work-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.work h3 {
+  margin-top: 0.9rem;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 2.5rem;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.work-role { margin-top: 0.5rem; font-size: 0.93rem; font-weight: 600; color: var(--tone); }
+.work-summary { margin-top: 0.9rem; font-size: 1.04rem; }
+.work .tech { margin-top: 1.15rem; }
+.work-links {
+  margin-top: 1.4rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+}
+
+/* stack: compacto, sin tarjetas. Va en columnas (no en grilla) para que un grupo largo no
+   deje un hueco al lado. */
+.stack { columns: 2; column-gap: 2.5rem; }
+.stack > div { break-inside: avoid; padding-bottom: 1.75rem; }
+.stack dt {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+  font: 500 0.7rem/1.5 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tone);
+}
+.stack dt::before { content: ""; width: 1rem; height: 1px; background: var(--tone); }
+
+/* contacto */
+.bigmail {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 4.6vw, 3.1rem);
+  line-height: 1.15;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--tone);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.channels { margin-top: 2.5rem; max-width: 40rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+.channels li { display: flex; align-items: center; gap: 0.9rem; padding: 0.95rem 1.1rem; }
+.channels li > .icon { width: 1.25rem; height: 1.25rem; color: var(--tone); }
+.channels .k {
+  display: block;
+  font: 500 0.66rem/1.5 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.channels a,
+.channels div > span:last-child { font-size: 0.88rem; color: var(--ink); overflow-wrap: anywhere; }
+.channels a { text-decoration-color: var(--line-strong); text-underline-offset: 0.3em; }
+.channels a:hover { text-decoration-color: var(--tone); }
+
+.form { margin-top: 1rem; padding: 1.6rem 1.7rem 1.7rem; }
+.form h3 { margin-bottom: 1.2rem; font-size: 1.15rem; font-weight: 650; color: var(--ink); }
+.field { display: block; margin-bottom: 1.1rem; }
+.field span { display: block; margin-bottom: 0.4rem; font-size: 0.82rem; font-weight: 600; }
+.field input,
+.field textarea {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.6rem;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+.field textarea { resize: vertical; min-height: 7.5rem; }
+.field input:focus,
+.field textarea:focus { outline: 2px solid var(--tone); outline-offset: 1px; border-color: var(--tone); }
+.field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem; }
+.hp { display: none; }
+.form .btn { margin-top: 0.4rem; }
+.form-status { margin-top: 1rem; min-height: 1.5rem; font-size: 0.92rem; }
+.form-status[data-state="ok"] { color: var(--ok); }
+.form-status[data-state="error"] { color: var(--err); }
+
+/* ---------- página de proyecto ---------- */
+
+.art-head { padding-top: 2.75rem; padding-bottom: 5rem; }
+.crumb a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.crumb a:hover { color: var(--ink); }
+.art-head .kicker { margin-top: 3.25rem; color: var(--tone); }
+.art-head h1 { margin-top: 0.9rem; margin-left: -0.04em; font-size: clamp(3.75rem, 11vw, 8rem); line-height: 0.9; }
+.art-head .lead { margin-top: 1.9rem; max-width: 45rem; font-size: clamp(1.2rem, 2vw, 1.5rem); line-height: 1.45; }
+
+.art-facts { margin-top: 2.75rem; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.art-facts:hover { border-color: var(--line); }
+.art-facts > div { padding: 1.1rem 1.4rem 1.2rem; }
+.art-facts > div + div { border-left: 1px solid var(--line); }
+.art-facts dt {
+  font: 500 0.7rem/1.5 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.art-facts dd { margin-top: 0.5rem; font-weight: 500; color: var(--ink); }
+.art-facts dd.status { display: inline-flex; margin-top: 0.4rem; }
+
+.figures { margin-top: 1rem; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.figures li { padding: 1.3rem 1.4rem 1.4rem; border-top: 2px solid var(--tone); }
+.figures strong {
+  display: block;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2.75rem, 5vw, 4rem);
+  line-height: 1;
+  color: var(--tone);
+  white-space: nowrap;
+}
+.figures span { display: block; margin-top: 0.7rem; font-size: 0.9rem; line-height: 1.45; color: var(--muted); }
+
+.points { display: grid; gap: 0.9rem; }
+p + .points { margin-top: 2rem; }
+.points li { padding: 1.3rem 1.5rem 1.4rem; border-left: 2px solid var(--tone); border-radius: 0.3rem 1rem 1rem 0.3rem; }
+.points li:hover { border-left-color: var(--tone); }
+.points h3 { font-size: 1.12rem; line-height: 1.35; font-weight: 650; color: var(--ink); }
+.points p { margin-top: 0.45rem; }
+
+.art-next { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding-top: 1rem; padding-bottom: 4.5rem; }
+.art-next a { position: relative; display: grid; gap: 0.4rem; padding: 1.5rem 3.5rem 1.7rem 1.6rem; text-decoration: none; }
+.art-next strong { font-family: var(--serif); font-weight: 400; font-size: 2.2rem; line-height: 1.05; color: var(--ink); }
+.art-next .icon { position: absolute; right: 1.5rem; top: 50%; margin-top: -0.55rem; color: var(--tone); transition: transform 0.15s; }
+.art-next a:hover .icon { transform: translateX(4px); }
+
+/* ---------- 404 ---------- */
+
+.notfound { max-width: 46rem; margin: 0 auto; padding: 20vh 2rem; }
+.notfound h1 { margin-top: 1rem; font-size: clamp(3rem, 9vw, 5.5rem); }
+.notfound .lead { margin-top: 1rem; color: var(--muted); }
+.notfound .actions { margin-top: 2.25rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.9rem 1.75rem; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 60rem) {
+  .nav-links { display: none; }
+  .nav-tools { margin-left: auto; }
+  .menu { display: block; }
+
+  .hero { padding: 3rem 0 3.5rem; }
+  .portrait { width: 10.5rem; height: 10.5rem; }
+
+  .sec { padding: 3.5rem 0; }
+  /* minmax(0, …) y no 1fr a secas: si no, la columna crece al ancho del carrusel. */
+  .sec-in { grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+  .sec-head { position: static; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 1rem; align-items: center; }
+  /* Apilada y fijada, el título se pega arriba del carrusel. En una grilla quedaría
+     encerrado en su fila y no podría: por eso acá la sección pasa a bloque. */
+  .is-pinned .sec-in { display: block; }
+  .is-pinned .sec-head { position: sticky; margin-bottom: 1.75rem; }
+  .sec-icon { grid-row: span 2; margin-bottom: 0; }
+  .sec-head p { max-width: none; margin-top: 0.15rem; }
+  .sec-head::after { display: none; }
+  /* En táctil se desliza con el dedo: las flechas sobran. */
+  .rail-nav { display: none; }
+  .role,
+  .roles-solo .role { width: min(26rem, 80vw); }
+  h2 { font-size: 2.2rem; }
+
+  .art-head { padding-bottom: 3.5rem; }
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .channels { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 40rem) {
+  .wrap { padding: 0 1.25rem; }
+  /* En inglés el botón dice "Resume": sin esto la barra no entra en 390px. */
+  .nav-in { gap: 0.75rem; }
+  .wordmark { font-size: 1.4rem; }
+  .nav-cv { margin-right: 0; padding: 0.4rem 0.8rem; }
+
+  .facts { flex-direction: column; align-items: stretch; width: 100%; max-width: 22rem; }
+  .facts > div { justify-content: space-between; border-radius: 0.8rem; }
+  .facts dd { text-align: right; }
+
+  .principles,
+  .field-row,
+  .art-next { grid-template-columns: 1fr; }
+  .stack { columns: 1; }
+  .entry { --entry-px: 1.2rem; padding: 1.25rem var(--entry-px) 1.35rem; }
+  .entry-head { flex-direction: column; gap: 0.75rem; }
+  .work { padding: 1.25rem 1.2rem 1.35rem; }
+  .work h3 { font-size: 2.2rem; }
+  .form { padding: 1.3rem 1.2rem 1.4rem; }
+  .art-facts { grid-template-columns: 1fr; }
+  .art-facts > div + div { border-left: 0; border-top: 1px solid var(--line); }
+  .notfound { padding: 14vh 1.25rem; }
+}
+
+/* En teléfonos las tarjetas ocupan casi todo el ancho y los puestos se apilan, el actual
+   arriba. Va después del bloque de 40rem para ganarle en los anchos más chicos. */
+@media (max-width: 30rem) {
+  .rail > .entry,
+  .rail > .entry-wide { width: min(34rem, 88%); }
+  .rail .role,
+  .rail .roles-solo .role,
+  .rail .entry-wide .role { flex: none; width: auto; }
+  .entry-wide .roles { gap: 1.75rem; }
+  .roles { flex-direction: column-reverse; gap: 1.75rem; margin: 1.5rem 0 0 0.35rem; padding: 0 0 0 1.5rem; border-top: 0; border-left: 2px solid var(--tone-line); }
+  .role,
+  .roles-solo .role { width: auto; }
+  .role::before { left: calc(-1.5rem - 1px - 0.4rem); top: 0.32rem; }
+  .roles-solo { margin: 0; padding: 0; border-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.smooth { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+
+@media print {
+  .nav, .skip, .fx { display: none !important; }
+  .sec-head { position: static; }
+}

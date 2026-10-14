@@ -1,0 +1,14 @@
+{
+  "name": "pablomelegatti.com",
+  "private": true,
+  "version": "1.0.0",
+  "description": "CV personal de Pablo Melegatti: sitio estatico bilingue (ES/EN), sin dependencias",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node serve-dev.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

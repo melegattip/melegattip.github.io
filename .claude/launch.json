@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "pablomelegatti",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["serve-dev.mjs"],
+      "port": 8125
+    }
+  ]
+}
