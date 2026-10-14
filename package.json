@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "dev": "node serve-dev.mjs"
+    "dev": "node serve-dev.mjs",
+    "deploy": "node publish.mjs"
   },
   "engines": {
     "node": ">=20"

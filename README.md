@@ -109,8 +109,21 @@ que impresa, y **Descargar PDF** abre el diálogo de impresión ("Guardar como P
 
 ## Deploy
 
-Vercel, sin framework: build `node build.mjs`, salida `dist/` (ya está en `vercel.json`).
-El dominio `pablomelegatti.com` se apunta al proyecto, con `www` redirigiendo al apex.
+**Hoy: GitHub Pages**, en <https://melegattip.github.io>. `main` tiene el código y
+`gh-pages`, el sitio armado. Para publicar, con los cambios ya commiteados:
+
+```bash
+node publish.mjs
+```
+
+Arma `dist/` y lo sube a `gh-pages`; Pages tarda un minuto en actualizar. Pages no lee
+`vercel.json`: ahí no aplican los headers de seguridad (CSP) ni los redirects
+(`/resume`, `/curriculum`, `/es`). Las URLs limpias sí andan, porque cada página es una
+carpeta con su `index.html`.
+
+**Destino: Vercel**, sin framework: build `node build.mjs`, salida `dist/` (ya está en
+`vercel.json`). El dominio `pablomelegatti.com` se apunta al proyecto, con `www`
+redirigiendo al apex.
 
 Las fuentes de `public/fonts/` (Inter para el texto, Instrument Serif para los títulos) son
 de uso libre bajo licencia OFL; cada licencia va al lado.
