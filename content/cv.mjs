@@ -14,8 +14,8 @@ export default {
 
   hero: {
     headline: {
-      es: "Me apasiona hacer más eficientes los productos en los que trabajo.",
-      en: "I'm passionate about making the products I work on more efficient.",
+      es: "Me apasiona emprender desafíos que aporten valor a la vida de las personas y organizaciones.",
+      en: "I'm passionate about taking on challenges that add value to the lives of people and organizations.",
     },
     // Los datos que van en píldoras debajo de la frase.
     facts: [
@@ -107,6 +107,7 @@ export default {
           from: "2025-01",
           to: null,
           stack: [
+            "Go",
             "Backend",
             { es: "Feature ownership", en: "Feature ownership" },
             { es: "Flujos con IA", en: "AI workflows" },
@@ -122,8 +123,8 @@ export default {
               en: "Implement AI-augmented engineering workflows to automate development and operational tasks.",
             },
             {
-              es: "Diseño soluciones backend con foco en escalabilidad y confiabilidad.",
-              en: "Design backend solutions focused on scalability and reliability.",
+              es: "Diseño servicios en Go para credit scoring, escalables y confiables.",
+              en: "Design Go services for credit scoring, built to scale and stay reliable.",
             },
             {
               es: "Impulso iniciativas de innovación que mejoran la productividad de ingeniería y los procesos de automatización.",
@@ -243,6 +244,22 @@ export default {
 
   // `story` = nombre del archivo en content/projects/ con la historia completa (opcional).
   projects: [
+    // Sólo información pública: lo que dijo Pablo (equipo backend, en Go) y la nota del blog
+    // de Mercado Pago sobre el score. Nada interno: ni arquitectura, ni volúmenes, ni modelos.
+    {
+      name: "Credit Scoring",
+      kind: { es: "Fintech", en: "Fintech" },
+      role: { es: "Equipo backend · Mercado Libre", en: "Backend team · Mercado Libre" },
+      status: { es: "En producción", en: "In production" },
+      url: "https://www.mercadopago.com.mx/blog/como-mejorar-score-crediticio",
+      // Texto del link cuando el dominio solo no alcanza para saber adónde lleva.
+      urlLabel: { es: "Blog de Mercado Pago", en: "Mercado Pago blog" },
+      summary: {
+        es: "Backend en Go del score crediticio de Mercado Pago: el puntaje que resume el comportamiento crediticio de una persona y con el que se decide si accede a un crédito y en qué condiciones.",
+        en: "Go backend for Mercado Pago's credit score: the number that sums up a person's credit behavior and decides whether they get credit and on what terms.",
+      },
+      tags: ["Go", { es: "Microservicios", en: "Microservices" }, "REST APIs", { es: "Observabilidad", en: "Observability" }],
+    },
     {
       name: "GIIA",
       story: "giia",

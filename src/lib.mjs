@@ -162,7 +162,7 @@ export function forLang(lang) {
   };
   const range = (from, to) => `${ym(from)} – ${to ? ym(to) : ui.present}`;
   const tags = (items, cls = "tags") => `<ul class="${cls}">${items.map((i) => `<li>${e(i)}</li>`).join("")}</ul>`;
-  const bullets = (items) => `<ul class="bullets">${items.map((b) => `<li>${e(b)}</li>`).join("")}</ul>`;
+  const bullets = (items = []) => (items.length ? `<ul class="bullets">${items.map((b) => `<li>${e(b)}</li>`).join("")}</ul>` : "");
   return { ui, t, e, ym, range, tags, bullets };
 }
 

@@ -176,7 +176,7 @@ ${cv.projects
               ? `
           <p class="work-links">${
             p.story ? `<a class="more" href="${href(lang, "project", p.story)}"><span>${esc(ui.readStory)}</span>${ICON.arrow}</a>` : ""
-          }${p.url ? `<a class="tlink" href="${p.url}" rel="noopener"><span>${host(p.url)}</span>${ICON.external}</a>` : ""}</p>`
+          }${p.url ? `<a class="tlink" href="${p.url}" rel="noopener"><span>${p.urlLabel ? e(p.urlLabel) : host(p.url)}</span>${ICON.external}</a>` : ""}</p>`
               : ""
           }
         </article>`,

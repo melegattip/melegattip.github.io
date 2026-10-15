@@ -65,7 +65,7 @@ ${nav({ lang, cv, altPath, onHome: false })}
       <div><dt>${esc(ui.status)}</dt><dd class="status"><span class="dot" aria-hidden="true"></span>${e(p.status)}</dd></div>${
         p.url
           ? `
-      <div><dt>${esc(ui.site)}</dt><dd><a class="tlink" href="${p.url}" rel="noopener"><span>${host(p.url)}</span>${ICON.external}</a></dd></div>`
+      <div><dt>${esc(ui.site)}</dt><dd><a class="tlink" href="${p.url}" rel="noopener"><span>${p.urlLabel ? e(p.urlLabel) : host(p.url)}</span>${ICON.external}</a></dd></div>`
           : ""
       }
     </dl>

@@ -59,7 +59,7 @@ ${job.roles
       .map(
         (p) => `      <article class="cv-project">
         <p class="kind">${e(p.kind)} · ${e(p.role)}</p>
-        <div class="cv-row"><h3>${e(p.name)}</h3>${p.url ? `<a class="plink" href="${p.url}">${host(p.url)}</a>` : ""}</div>
+        <div class="cv-row"><h3>${e(p.name)}</h3>${p.url ? `<a class="plink" href="${p.url}">${p.urlLabel ? e(p.urlLabel) : host(p.url)}</a>` : ""}</div>
         <p>${e(p.summary)}</p>
         ${bullets(p.bullets)}
         ${tags(p.tags)}
