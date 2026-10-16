@@ -626,9 +626,19 @@ main { position: relative; z-index: 1; }
 /* Sin scrollbar no hace falta el espacio que se le reserva abajo. */
 .is-pinned .rail { overflow-x: hidden; scroll-snap-type: none; padding-bottom: 0.4rem; }
 .is-pinned .rail > * { transform: translateX(var(--rail-x, 0px)); will-change: transform; }
-/* Barra de avance: se llena con las tarjetas y queda completa durante la pausa final. */
-.is-pinned .rail-bar { display: block; height: 2px; margin-top: 0.85rem; border-radius: 2px; background: var(--line); overflow: hidden; }
-.is-pinned .rail-bar span { display: block; height: 100%; background: var(--tone); transform-origin: 0 50%; transform: scaleX(var(--rail-p, 0)); }
+/* Barra de avance: se llena con las tarjetas y queda completa durante la pausa final.
+   En el carrusel suelto (.is-swipe, el de pantallas táctiles) sigue al deslizamiento. */
+.is-pinned .rail-bar,
+.is-swipe .rail-bar { display: block; height: 2px; margin-top: 0.85rem; border-radius: 2px; background: var(--line); overflow: hidden; }
+.is-pinned .rail-bar span,
+.is-swipe .rail-bar span { display: block; height: 100%; background: var(--tone); transform-origin: 0 50%; transform: scaleX(var(--rail-p, 0)); }
+/* Con la barra, la del navegador sobra. */
+.is-swipe .rail { scrollbar-width: none; padding-bottom: 0.4rem; }
+.is-swipe .rail::-webkit-scrollbar { display: none; }
+/* Con el dedo, cada deslizamiento deja una tarjeta entera al principio. */
+@media (hover: none) and (pointer: coarse) {
+  .rail { scroll-snap-type: x mandatory; }
+}
 
 /* Donde el navegador lo soporta, el avance va atado al scroll por CSS: lo mueve el
    compositor, en sincronía exacta con el scroll y sin pasar por JavaScript. El rango
@@ -851,6 +861,11 @@ p + .points { margin-top: 2rem; }
   .facts { flex-direction: column; align-items: stretch; width: 100%; max-width: 22rem; }
   .facts > div { justify-content: space-between; border-radius: 0.8rem; }
   .facts dd { text-align: right; }
+
+  /* La experiencia va en columna: en angosto la tarjeta de una empresa con dos puestos mide
+     más de dos pantallas y, en carrusel, dejaba un hueco enorme debajo de las demás. */
+  .jobs.rail { flex-direction: column; gap: 1rem; margin: 0; padding: 0; overflow: visible; scroll-snap-type: none; }
+  .jobs.rail > .entry { width: auto; }
 
   .principles,
   .field-row,

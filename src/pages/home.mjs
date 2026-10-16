@@ -150,7 +150,7 @@ ${[...roles]
     "experience",
     ui.experienceTitle,
     ui.experienceSub,
-    pin(`      <ol class="entries rail" data-rail tabindex="0">
+    pin(`      <ol class="entries rail jobs" data-rail tabindex="0">
 ${cv.experience.map(company).join("\n")}
       </ol>`),
     true,

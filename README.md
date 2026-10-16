@@ -52,12 +52,19 @@ Genera `dist/` (lo que se publica). No se commitea.
 
 ## Scroll lateral
 
-En Experiencia, Proyectos y Stack las tarjetas van en fila. Al bajar, el carrusel queda fijo,
+En Experiencia y Proyectos las tarjetas van en fila. Al bajar, el carrusel queda fijo,
 centrado en la pantalla, y las tarjetas pasan de costado; una barra marca el avance. Cuando
 se terminan hay una pausa corta y la página sigue bajando.
 
-Si el carrusel no entra entero en la ventana (pantallas bajas, o Experiencia en teléfonos) o
-hay "movimiento reducido", queda como carrusel común: se desliza con el dedo o con las flechas.
+Queda como carrusel común (se desliza con el dedo, la rueda o las flechas, con la misma barra
+de avance) en tres casos: pantallas táctiles, donde fijado el deslizamiento lateral no hacía
+nada; carruseles que no entran enteros en la ventana; y "movimiento reducido". En teléfonos
+(≤ 40rem) Experiencia va en columna: la tarjeta de Mercado Libre mide más de dos pantallas y,
+en fila, dejaba un hueco enorme debajo de las otras.
+
+En el celular la barra de direcciones aparece y desaparece al scrollear y eso dispara
+`resize`. `site.js` sólo rearma los carruseles si cambia el ancho o el alto cambia en serio;
+si no, la página saltaba y los carruseles volvían a la primera tarjeta.
 
 El movimiento lo hace CSS (`animation-timeline`, atado al scroll) donde el navegador lo
 soporta, y `site.js` donde no.

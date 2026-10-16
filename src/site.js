@@ -63,6 +63,10 @@
   // de costado más la pausa) y el carrusel va con position: sticky.
   function rails() {
     var calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // En pantallas táctiles el carrusel no se fija: se desliza con el dedo, que es lo que
+    // la gente intenta. Fijado, el deslizamiento lateral no hacía nada.
+    var touch = window.matchMedia("(hover: none) and (pointer: coarse)");
+    var seen = { w: 0, h: 0 };
     // Con animaciones atadas al scroll (CSS), el movimiento lateral lo hace el compositor,
     // en sincronía exacta con el scroll. Donde no existen, lo hace este archivo.
     var native = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline: view()"));
@@ -98,8 +102,10 @@
       rail.addEventListener("scroll", function () {
         // Fijada, el carrusel no scrollea por dentro (lo mueve un transform). Si el
         // navegador lo corre igual, p. ej. al enfocar un link con Tab, se vuelve a cero.
-        if (pin.on) { if (rail.scrollLeft) rail.scrollLeft = 0; }
-        else arrows(pin, rail.scrollLeft, rail.scrollWidth - rail.clientWidth);
+        if (pin.on) { if (rail.scrollLeft) rail.scrollLeft = 0; return; }
+        var max = rail.scrollWidth - rail.clientWidth;
+        arrows(pin, rail.scrollLeft, max);
+        if (max > 0) wrap.style.setProperty("--rail-p", Math.min(1, rail.scrollLeft / max).toFixed(4));
       }, { passive: true });
     });
     if (!pins.length) return;
@@ -130,10 +136,14 @@
 
     function layout() {
       var bar = topbar ? topbar.offsetHeight : 0;
-      var vh = window.innerHeight;
+      // El alto sin la barra de direcciones del celular, que aparece y desaparece al
+      // scrollear (innerHeight cambia con ella; clientHeight no).
+      var vh = document.documentElement.clientHeight;
+      seen = { w: window.innerWidth, h: vh };
       pins.forEach(function (p) {
+        var was = p.on;
         p.on = false;
-        p.section.classList.remove("is-pinned", "is-native");
+        p.section.classList.remove("is-pinned", "is-native", "is-swipe");
         p.body.style.height = "";
         p.body.style.marginBottom = "";
         if (p.inner) p.inner.style.marginBottom = "";
@@ -141,11 +151,16 @@
         p.wrap.style.removeProperty("--rail-x");
         p.wrap.style.removeProperty("--rail-p");
         if (p.head) p.head.style.top = "";
-        p.rail.scrollLeft = 0;
+        // Si no estaba fijado, se respeta hasta dónde lo deslizó la persona.
+        if (was) p.rail.scrollLeft = 0;
 
         var travel = p.rail.scrollWidth - p.rail.clientWidth;
-        if (calm.matches || travel <= 40) {
+        if (travel <= 40) {
           arrows(p, 0, travel);
+          return;
+        }
+        if (calm.matches || touch.matches) {
+          free(p, travel);
           return;
         }
         // Se mide ya con la clase puesta: fijado, el carrusel suma la barra de avance y
@@ -156,7 +171,7 @@
         // cortado mientras está fijo: mejor el carrusel común.
         if (tall > vh - bar - 16) {
           p.section.classList.remove("is-pinned");
-          arrows(p, 0, travel);
+          free(p, travel);
           return;
         }
         // Se fija centrado en el espacio que queda debajo de la barra superior…
@@ -167,6 +182,7 @@
         p.on = true;
         p.top = top;
         p.travel = travel;
+        p.rail.scrollLeft = 0;
         if (native) p.section.classList.add("is-native");
         p.body.style.height = p.body.offsetHeight + travel + dwell + "px";
         p.wrap.style.top = top + "px";
@@ -193,8 +209,27 @@
       follow();
     }
 
+    // Carrusel suelto (se desliza con el dedo, la rueda o las flechas), con su barra de
+    // avance según cuánto se deslizó.
+    function free(p, travel) {
+      p.section.classList.add("is-swipe");
+      var at = p.rail.scrollLeft;
+      arrows(p, at, travel);
+      p.wrap.style.setProperty("--rail-p", Math.min(1, at / travel).toFixed(4));
+    }
+
+    // En el celular, la barra de direcciones dispara resize al aparecer y desaparecer
+    // mientras se scrollea. Rearmar ahí hacía saltar la página y devolvía los carruseles a
+    // la primera tarjeta: sólo se rearma si cambia el ancho o el alto cambia de verdad.
+    function resized() {
+      var h = document.documentElement.clientHeight;
+      if (window.innerWidth === seen.w && Math.abs(h - seen.h) < 160) return;
+      layout();
+    }
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", layout);
+    window.addEventListener("resize", resized);
+    if (touch.addEventListener) touch.addEventListener("change", layout);
     window.addEventListener("load", layout);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
     layout();
