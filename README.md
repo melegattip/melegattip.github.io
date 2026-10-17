@@ -10,6 +10,7 @@ dependencias: sólo Node ≥ 20.
 | `/` | `/en` | Portfolio: hero animado + Perfil, Experiencia, Proyectos, Stack, Educación y Contacto |
 | `/cv` | `/en/cv` | CV clásico en una hoja A4, con botón Descargar PDF |
 | `/proyectos/<slug>` | `/en/projects/<slug>` | Historia de un proyecto |
+| `/sentate-primero` | — | Ejercicio del Taller Sentate primero (fuera del menú, `noindex`): formulario que genera un PDF en el celular. Archivos en `public/sentate-primero/` |
 
 ## Editar el contenido
 

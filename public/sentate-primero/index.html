@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi casa y la plata</title>
+<meta name="description" content="Ejercicio final del Taller Sentate primero: diez hábitos de la plata en mi casa.">
+<meta name="theme-color" content="#111827">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/sentate-primero/app.css">
+</head>
+<body>
+<header class="hero">
+  <div class="inner">
+    <p class="eyebrow">Taller Sentate primero · Encuentro 1</p>
+    <h1>¿Cómo se maneja la plata en mi casa?</h1>
+    <p>Diez hábitos para revisar: qué se hace bien y qué conviene mejorar.</p>
+    <div class="bar" aria-hidden="true"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <form id="form" novalidate>
+    <section class="card intro" aria-labelledby="consigna">
+      <h2 id="consigna">Antes de empezar</h2>
+      <ul>
+        <li>Es <b>personal y anónimo</b>: no se envía ni se guarda en ningún lado.</li>
+        <li><b>No es para juzgar a nadie.</b> Es para descubrir qué querés llevarte a tu vida y qué querés hacer distinto.</li>
+        <li>Al final apretás <b>Finalizar</b> y se descarga un PDF con tus respuestas para trabajarlo en la semana.</li>
+      </ul>
+      <div class="legend" aria-hidden="true">
+        <span><i class="dot dot-si"></i>Sí, funciona</span>
+        <span><i class="dot dot-no"></i>No, hay que mejorarlo</span>
+        <span><i class="dot dot-ns"></i>No sé cómo es en mi casa</span>
+      </div>
+    </section>
+
+    <div class="field card">
+      <label class="lbl" for="nombre">Tu nombre (opcional)</label>
+      <p class="hint">Solo aparece en tu PDF.</p>
+      <input type="text" id="nombre" name="nombre" autocomplete="given-name" maxlength="60">
+    </div>
+
+    <p class="section-title">En mi casa…</p>
+    <p class="section-sub">Marcá una opción en cada hábito</p>
+    <div id="questions"></div>
+
+    <p class="section-title">Mi compromiso</p>
+    <p class="section-sub">De lo que aprendí en casa…</p>
+    <div class="card commit keep field">
+      <h3><label for="conservo">Conservo</label></h3>
+      <p class="hint">Algo que marcaste como “Sí, funciona” y querés llevar a tu vida.</p>
+      <textarea id="conservo" name="conservo" maxlength="600"></textarea>
+    </div>
+    <div class="card commit change field">
+      <h3><label for="cambio">Cambio</label></h3>
+      <p class="hint">Algo que marcaste como “No, hay que mejorarlo” y querés hacer distinto.</p>
+      <textarea id="cambio" name="cambio" maxlength="600"></textarea>
+    </div>
+
+    <div id="msg" class="msg" role="alert"></div>
+  </form>
+
+  <section id="done" class="card" aria-live="polite">
+    <p class="eyebrow eyebrow-ok">Listo</p>
+    <p class="big">Tu PDF está listo</p>
+    <p>Tocá “Descargar PDF” para guardarlo. Si no se descarga, tocá “Abrir PDF” y guardalo o compartilo desde ahí.</p>
+    <div class="actions">
+      <a class="primary btnlink" id="dl" href="#" download="mi-casa-y-la-plata.pdf">Descargar PDF</a>
+      <a class="secondary btnlink" id="open" href="#" target="_blank" rel="noopener">Abrir PDF</a>
+      <button type="button" class="secondary" id="edit">Volver a mis respuestas</button>
+    </div>
+  </section>
+
+  <p class="note">Nada de lo que escribís sale de tu celular.</p>
+</main>
+
+<div class="footer-bar" id="footer">
+  <div class="inner">
+    <div class="progress" aria-hidden="true">
+      <div class="txt" id="ptxt">0 de 10 hábitos</div>
+      <div class="track"><div class="fill" id="pfill"></div></div>
+    </div>
+    <button type="button" class="primary" id="finish">Finalizar</button>
+  </div>
+</div>
+
+<script src="/sentate-primero/jspdf.umd.min.js"></script>
+<script src="/sentate-primero/app.js"></script>
+</body>
+</html>
